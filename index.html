@@ -10,16 +10,21 @@
     <div class="container">
         <!-- Table Section -->
         <div class="section table-container">
-            <h2>Data Table</h2>
+            <h2>Your Activities</h2>
             <table>
                 <thead>
                     <tr>
                         <th id="s_no">S.No</th>
-                        <th>Topic</th>
+                        <th>Recently Searched Topic </th>
                     </tr>
                 </thead>
                 <tbody id="table-body">
-                    <!-- Table data will be added here dynamically (optional) -->
+                {% for activity in activity_log %}
+                        <tr>
+                            <td>{{ activity.s_no }}</td>
+                            <td>{{ activity.message }}</td>
+                        </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -27,24 +32,45 @@
         <!-- Chat Input Section -->
         <div class="section textarea-container">
             <h2>Ask Me Anything</h2>
+            <br>
             <form action="/ask" method="POST">
                 <textarea name="userInput" placeholder="Type your message..." required></textarea>
                 <button type="submit">ASK</button>
             </form>
+            <br>
             <!-- Display the response from the bot (if any) -->
             {% if bot_response,user_response %}
                 <div class="response">
-                    <p>{{ user_response }}</p>
-                    <p>{{ bot_response }}</p>
+                    <p><strong>{{ user_response }}</strong></p>
+                    <br>
+                    <p><strong>{{ bot_response }}</strong></p>
                 </div>
             {% endif %}
         </div>
 
         <!-- About Section -->
-        <div class="section about-section">
-            <h2>About This Bot</h2>
-            <p>This is an AI-based chatbot designed to answer your questions and provide information. You can ask about various topics!</p>
-        </div>
+        <!-- About Section -->
+<div class="section about-section">
+    <h2>About This Bot</h2>
+    <p><strong>AI Chat Assistant</strong> is a smart chatbot designed to help you find quick answers, generate ideas, and solve problems efficiently.</p>
+
+    <h3>🚀 How It Works?</h3>
+    <p>Simply type your question in the chat box and get an instant response powered by AI.</p>
+
+    <h3>✨ Key Features</h3>
+    <ul>
+        <li>🔹 Provides instant responses to queries</li>
+        <li>🔹 Supports multiple topics and categories</li>
+        <li>🔹 Keeps track of your recent searches</li>
+        <li>🔹 Easy-to-use, friendly chat interface</li>
+    </ul>
+
+    <h3>💡 How to Use?</h3>
+    <p>🔸 Ask questions about any topic.<br>🔸 Use clear and specific words for better answers.<br>🔸 Review your previous searches for quick reference.</p>
+
+    <p><strong>Start Exploring Now!</strong> Ask your first question and let AI do the rest. 🚀</p>
+</div>
+
     </div>
 </body>
 </html>
