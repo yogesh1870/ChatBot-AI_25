@@ -3,25 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat - ChatGPT-like</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
-    <title>ChatterBot Chatbot</title>
 </head>
 <body>
-    <div style="width: 300px; margin: auto;">
-        <h1>Chat with MyBot</h1>
+    <div class="container">
+        <!-- Table Section -->
+        <div class="section table-container">
+            <h2>Data Table</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th id="s_no">S.No</th>
+                        <th>Topic</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Table data will be added here dynamically (optional) -->
+                </tbody>
+            </table>
+        </div>
 
-        <div>
-            {% if user_input %}
-                <p><strong>You:</strong> {{ user_input }}</p>
-                <p><strong>Bot:</strong> {{ bot_response }}</p>
+        <!-- Chat Input Section -->
+        <div class="section textarea-container">
+            <h2>Ask Me Anything</h2>
+            <form action="/ask" method="POST">
+                <textarea name="userInput" placeholder="Type your message..." required></textarea>
+                <button type="submit">ASK</button>
+            </form>
+            <!-- Display the response from the bot (if any) -->
+            {% if bot_response,user_response %}
+                <div class="response">
+                    <p>{{ user_response }}</p>
+                    <p>{{ bot_response }}</p>
+                </div>
             {% endif %}
         </div>
 
-        <form method="POST">
-            <input type="text" name="user_input" placeholder="Ask something..." required />
-            <button type="submit">Send</button>
-        </form>
+        <!-- About Section -->
+        <div class="section about-section">
+            <h2>About This Bot</h2>
+            <p>This is an AI-based chatbot designed to answer your questions and provide information. You can ask about various topics!</p>
+        </div>
     </div>
 </body>
 </html>
