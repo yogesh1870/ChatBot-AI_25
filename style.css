@@ -1,101 +1,109 @@
- body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            height: 100vh;
-            background-color: #f7f7f7;
-        }
+/* Reset default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
 
-        .container {
-            display: flex;
-            flex: 1;
-            padding: 20px;
-            justify-content: space-between;
-        }
+/* Main Page Layout */
+.container {
+    display: flex;
+    width: 90%;
+    height: 90vh; /* Keeps full screen */
+    margin: auto;
+    gap: 20px;
+}
 
-        .section {
-            width: 30%;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-right: 10px;
-        }
+/* Table Section (Reduced Width) */
+.table-container {
+    flex: 1.5; /* Reduced width slightly */
+    background: #f8f8f8;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
 
-        .section:last-child {
-            margin-right: 0;
-        }
+/* Table Styles */
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-        .section h2 {
-            text-align: center;
-            color: #333;
-        }
+.table-container th, .table-container td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
 
-        .table-container {
-            height: 300px;
-            overflow-y: auto;
-            width:700px
-        }
+.table-container th {
+    background: #007bff;
+    color: white;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
+/* Chat Section */
+.textarea-container {
+    flex: 2; /* Balanced width */
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
 
-        table, th, td {
-            border: 1px solid #ddd;
-        }
+/* Input Box */
+.textarea-container textarea {
+    width: 100%;
+    height: 100px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    resize: none;
+}
 
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
+/* Chat Messages */
+.chat-messages {
+    margin-top: 15px; /* Space between chat texts and Ask button */
+}
 
-        .textarea-container {
-            display: flex;
-            flex-direction: column;
-            gap:10px;
-            width:100%;
-            height:100%;
-        }
+/* Ask Button */
+.textarea-container button {
+    margin-top: 15px; /* More space below chat texts */
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
-        .textarea-container textarea {
-            width: 95%;
-            height: 50px;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            resize: none;
-            outline: none;
-        }
+.textarea-container button:hover {
+    background: #0056b3;
+}
 
-        .textarea-container button {
-            padding: 10px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
+/* About Section */
+.about-section {
+    flex: 1; /* No change */
+    background: #f8f8f8;
+    padding: 20px; /* Added more padding */
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
 
-        .textarea-container button:hover {
-            background-color: #0056b3;
-        }
+/* About Section Text Spacing */
+.about-section p, .about-section h2, .about-section h3, .about-section ul {
+    margin-bottom: 12px; /* Space between each content */
+}
 
-        .about-section {
-            background-color: #f9f9f9;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
+/* Responsive Design */
+@media screen and (max-width: 1024px) {
+    .container {
+        flex-direction: column;
+        width: 100%;
+    }
 
-        .about-section p {
-            font-size: 16px;
-            color: #333;
-        }
+    .table-container, .textarea-container, .about-section {
+        flex: none;
+        width: 100%;
+    }
+}
