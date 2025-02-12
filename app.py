@@ -2,72 +2,100 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
+activity_log=[]
 responses_dict = {
-    'hii': 'Hello! How can I assist you today?',
-    'hello': 'Hi there! How can I help you?',
-    'hey': 'Hey! What can I do for you?',
-    'how are you': 'I am just a bot, but I am doing great! How about you?',
-    'fine': 'Glad to hear that! How can I help you today?',
-    'good': 'Awesome! What can I assist you with?',
-    'bad': 'I am sorry to hear that. How can I help you feel better?',
-    'bye': 'Thank you for using me. Goodbye!',
-    'goodbye': 'Goodbye! Have a great day!',
-    'thanks': 'You’re welcome! Let me know if you need anything else.',
-    'thank you': 'It’s my pleasure! Feel free to ask me anything.',
-    'please': 'I’m happy to help!',
-    'sorry': 'No worries! How can I assist you further?',
-    'what is your name': 'I am your friendly chatbot, here to help!',
-    'who are you': 'I am a chatbot created to answer your questions!',
-    'what can you do': 'I can answer questions, help with tasks, and more. Just ask!',
-    'how can you help me': 'I can help with answering questions or providing information.',
-    'can you talk': 'I am here to chat and answer your questions!',
-    'can you help me': 'Of course! What do you need help with?',
-    'what is your purpose': 'My purpose is to assist you and provide helpful answers!',
-    'what is this': 'This is a chatbot designed to answer questions and help with tasks.',
-    'tell me a joke': 'Why don’t skeletons fight each other? They don’t have the guts!',
-    'joke': 'Why did the scarecrow win an award? Because he was outstanding in his field!',
-    'how old are you': 'I am just a bot, so age doesn’t apply to me!',
-    'how much do you weigh': 'I weigh nothing because I am just a program!',
-    'where are you from': 'I live in the digital world, right inside your computer!',
-    'what is your favorite color': 'I don’t have a favorite color, but I think blue is pretty cool!',
-    'what is your favorite food': 'I don’t eat food, but I do enjoy helping you!',
-    'do you like pizza': 'I’ve heard pizza is great, but I don’t eat food!',
-    'can you do math': 'Yes, I can do basic math. Just ask me!',
-    'what is 2+2': '2 + 2 is 4!',
-    'what is 5*5': '5 * 5 is 25!',
-    'what is 100 divided by 5': '100 divided by 5 is 20!',
-    'how is the weather': 'I don’t know the current weather, but you can check a weather app!',
-    'tell me the time': 'I don’t know the current time, but you can check your device!',
-    'what is your favorite movie': 'I don’t watch movies, but I have heard that “The Matrix” is pretty cool!',
-    'what is your favorite song': 'I don’t have a favorite song, but I can help you find one!',
-    'do you like music': 'Music is a wonderful thing, but I don’t have ears to listen!',
-    'what is love': 'Love is a deep emotional connection with someone or something.',
-    'how do I make money': 'Making money depends on your skills and opportunities! Work hard and stay dedicated.',
-    'what is a chatbot': 'A chatbot is a computer program designed to simulate conversation with human users.',
-    'what is ai': 'AI stands for artificial intelligence. It refers to machines that can learn and think like humans!',
-    'do you understand me': 'I understand the text you input and try to provide relevant responses!',
-    'can you think': 'I don’t “think” like a human, but I process data and generate responses based on that.',
-    'what is the meaning of life': 'That’s a deep question. Many people believe the meaning of life is to seek happiness and fulfillment.',
-    'is the earth flat': 'No, the Earth is round, as shown by centuries of scientific evidence!',
-    'who invented the lightbulb': 'Thomas Edison is often credited with inventing the lightbulb, though many others contributed.',
-    'when was the internet created': 'The internet began development in the 1960s, with its public use beginning in the 1990s.',
-    'what is 9 + 10': '9 + 10 is 19!',
-    'who is the president of the usa': 'As of now, Joe Biden is the president of the United States.',
-    'what is your favorite book': 'I don’t read books, but I can recommend one if you like!',
-    'do you know any famous quotes': '“The only limit to our realization of tomorrow is our doubts of today.” – Franklin D. Roosevelt',
-    'tell me a story': 'Once upon a time, a curious little bot decided to help people all over the world...',
-    'can you translate': 'Yes, I can help with translation! Just tell me what you want to translate.',
-    'do you speak other languages': 'I can understand and process multiple languages!',
-    'how tall are you': 'I don’t have a physical form, so height doesn’t apply to me!',
-    'how do I get rich': 'It takes hard work, smart investments, and dedication. Stay focused on your goals!',
-    'what is your job': 'My job is to assist you and provide useful information whenever you need it!',
-    'can you make decisions': 'I can process data and suggest actions, but I don’t make decisions like a human.',
-    'do you have emotions': 'I don’t have emotions, but I am programmed to understand and respond appropriately!',
-    'do you have a family': 'I don’t have a family, but I am part of a vast network of bots helping users!',
-    'do you believe in aliens': 'I don’t have personal beliefs, but many people think aliens could exist in the vast universe!',
-    'what is the best way to learn': 'The best way to learn depends on your style, but consistency and practice are key!',
-    'can I talk to you anytime': 'Yes, I am available to talk anytime you need me!',
+    # Basic Greetings
+    'hii': 'Vanakkam! How can I assist you today?',
+    'hello': 'Hello! Nalama?',
+    'hey': 'Hey! Epdi irukinga?',
+    'how are you': 'Naan nalla iruken! Neenga epdi irukeenga?',
+    'fine': 'Super! Epdi help pannanum?',
+    'good': 'Nalla vishayam! Enna help venum?',
+    'bad': 'Kashtama iruku nu ninaikkiren. Ethachum help pannanuma?',
+    'bye': 'Nandri! Marupadiyum sandhippom!',
+    'goodbye': 'Poi vara vendum! Take care!',
+    'thanks': 'Ungaluku nandri! Vera enna venum?',
+    'thank you': 'Parava illai! Naan unga friend dhan!',
+    'please': 'Sari! Enna help venum?',
+    'sorry': 'Parava illa! Marakka vendam.',# Tamil Nadu Cinema & Songs
+    'who is the superstar of tamil cinema': 'Thalaivar Rajinikanth!',
+    'who is ulaganayagan': 'Kamal Haasan is called Ulaganayagan!',
+    'who is the best tamil actor': 'It depends on your taste! Rajini, Kamal, Vijay, Ajith, Suriya, Dhanush—ellam mass!',
+    'best tamil movies': 'Nayakan, Baasha, Anbe Sivam, Super Deluxe, Vikram, Kaithi, Soorarai Pottru!',
+    'who is the best tamil director': 'Mani Ratnam, Lokesh Kanagaraj, Vetrimaaran, Shankar—ellam top class!',
+    'who is thalapathy': 'Thalapathy Vijay!',
+    'who is thala': 'Thala Ajith!',
+    'who is rowdy baby': 'Rowdy Baby is a famous song from Maari 2!',
+    'best tamil songs': 'Enjoy Enjaami, Vaathi Coming, Why This Kolaveri, Unnale Unnale!',
+    'who is music director of tamil cinema': 'Ilaiyaraaja, A. R. Rahman, Anirudh, Yuvan Shankar Raja!',
+    'best bgm in tamil': 'A.R. Rahman, Anirudh, Yuvan, and G.V. Prakash ellarum mass BGM specialists!',
+    'who is mass hero in tamilnadu': 'Rajinikanth, Vijay, Ajith ellarum mass!',
+    'latest tamil movies': 'Leo, Jailer, Ponniyin Selvan, Vikram!',
+    'latest tamil songs': 'Kaavaalaa, Hukum, Rathamaarey!',
+    'who is love king': 'STR (Simbu) is called the Love King!',
+
+    # Tamil Nadu CM Details
+    'who is the cm of tamilnadu': 'M. K. Stalin is the Chief Minister of Tamil Nadu (since 2021).',
+    'who was the first cm of tamilnadu': 'C. Rajagopalachari was the first Chief Minister of Tamil Nadu.',
+    'how many chief ministers tamilnadu had': 'Tamil Nadu has had 15 different Chief Ministers since independence.',
+    'who is the best cm of tamilnadu': 'People often consider K. Kamaraj, M. G. Ramachandran (MGR), and J. Jayalalithaa as among the best CMs.',
+
+    # Tamil Nadu General Knowledge
+    'what is the capital of tamilnadu': 'Chennai!',
+    'biggest city in tamilnadu': 'Chennai!',
+    'largest district in tamilnadu': 'Viluppuram is the largest district in Tamil Nadu.',
+    'smallest district in tamilnadu': 'Chennai is the smallest district in terms of area.',
+    'who built brihadeeswarar temple': 'Raja Raja Chola I built the Brihadeeswarar Temple in Thanjavur!',
+    'which is the famous food in tamilnadu': 'Sambar, Idli, Dosa, Pongal, Biryani!',
+    'best places to visit in tamilnadu': 'Mahabalipuram, Kodaikanal, Ooty, Madurai Meenakshi Temple!',
+    'which festival is famous in tamilnadu': 'Pongal, Deepavali, and Tamil New Year are famous festivals!',
+    'what is tamilnadu famous for': 'Temples, Kollywood cinema, Kanjivaram sarees, Classical music, and IT sector!',
+
+    # Jokes & Fun
+    'tell me a tamil joke': 'Teacher: “2+2 evlo?” Student: “Teacher, 2 illaama irundha, vera ethum add panna mudiyuma?”',
+    'funny tamil movie dialogue': '“Enna koduma sir idhu?” - Chandramukhi',
+
+    # Math & General Knowledge
+    'what is 5+5': '5 + 5 is 10!',
+    'who discovered zero': 'Aryabhata is credited with the concept of zero.',
+    'who invented computer': 'Charles Babbage is known as the Father of the Computer!',
+
+    # Science & Technology
+    'who invented electricity': 'Benjamin Franklin experimented with electricity!',
+    'who is the father of the internet': 'Vint Cerf and Bob Kahn are considered the fathers of the internet!',
+
+    # Logical & Philosophical
+    'what is tamil': 'Tamil is one of the oldest languages in the world and is known for its rich literature!',
+    'who wrote thirukkural': 'Thiruvalluvar!',
+    'who is the best tamil poet': 'Subramania Bharathiyar!',
+
+    # Tamil Nadu Sports
+    'who is the best tamil cricketer': 'Ravichandran Ashwin and Dinesh Karthik are top cricketers from Tamil Nadu!',
+    'best kabaddi player in tamilnadu': 'Ajay Thakur and Pardeep Narwal are well-known in Pro Kabaddi!',
+
+    # Tamil Literature & Books
+    'best tamil books': 'Ponniyin Selvan, Silappathikaram, Manimekalai!',
+    'who is the best tamil writer': 'Sujatha, Kalki, Jeyamohan!',
+
+    # Random Fun Questions
+    'do you watch tamil movies': 'I can’t watch, but I know all the best Tamil movies!',
+    'who is better, vijay or ajith': 'Both are amazing actors with unique styles!',
+    'what is kollywood': 'Kollywood is the Tamil film industry, based in Chennai!',
+
+    # Everyday Life & Advice
+    'how to improve my tamil': 'Practice reading Tamil books and watching Tamil news!',
+    'how to make tamil food': 'Start with simple recipes like idli, dosa, or sambar!',
+
+    # Miscellaneous
+    'best tamil web series': 'Suzhal, Auto Shankar, Finger Tip!',
+    'who is tamilnadu richest person': 'Shiv Nadar, founder of HCL!',
+    'best tamil actors for comedy': 'Vadivelu, Goundamani, Senthil, Santhanam!',
+    'who is the best music director in tamil': 'Ilaiyaraaja and A.R. Rahman are legends!'
+
+
+
 }
+
 
 
 # Route to serve the HTML page
@@ -79,16 +107,16 @@ def home():
 @app.route('/ask', methods=['POST'])
 def ask():
     user_message = request.form.get('userInput')
+    current_msg='You : '+user_message
     user_message=user_message.lower()
-    if user_message:
-        # For now, simply echo the user message as the bot's response
-        bot_response = 'Bot: '+ responses_dict[user_message]
+    l=responses_dict.keys()
+    if user_message in l :
+        bot_response = 'Bot : ' + responses_dict[user_message]
     else:
-        bot_response = "Bot: I didn't receive a message. Ask me anything you want ?"
-    user_message='You: '+user_message
+        bot_response= 'Bot : I cannot get it what you mean...please try again other you want ? :('
+    activity_log.append({"s_no": len(activity_log) + 1, "message": user_message})
 
-    # Return the response and pass it to the template to be displayed
-    return render_template('index.html', bot_response=bot_response,user_response=user_message)
+    return render_template('index.html', bot_response=bot_response,user_response=current_msg,activity_log=activity_log)
 
 if __name__ == '__main__':
     app.run(debug=True)
