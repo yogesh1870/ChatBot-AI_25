@@ -10,7 +10,7 @@
 .container {
     display: flex;
     width: 90%;
-    height: 90vh; /* Keeps full screen */
+    height: 100vh; /* Keeps full screen */
     margin: auto;
     gap: 20px;
 }
@@ -43,11 +43,18 @@
 
 /* Chat Section */
 .textarea-container {
-    flex: 2; /* Balanced width */
+     flex: 2;
     background: #ffffff;
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+
+    /* Set max height and enable scrolling */
+    display: flex;
+    flex-direction: column;
+    max-height: 100vh; /* Limits height to prevent overflow */
+    overflow-y: auto;
+
 }
 
 /* Input Box */
