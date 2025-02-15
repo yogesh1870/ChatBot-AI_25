@@ -115,6 +115,7 @@ responses_dict = {
     'death': 'Pirappuum maraippum sathiyam!',
     'truth': 'Unmai eppovum veliyeru!',
     'lie': 'Poi solradhu thappu!',
+    'King':'Virat Kohli',
 }
 
 API_KEY = 'AIzaSyALCOS1sIhzeZZW9Ol-n1kAwYNBh0quzW8'
