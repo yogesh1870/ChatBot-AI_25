@@ -15,7 +15,7 @@
                 <thead>
                     <tr>
                         <th id="s_no">S.No</th>
-                        <th>Recently Searched Topic </th>
+                        <th>Recently Searched Topic</th>
                     </tr>
                 </thead>
                 <tbody id="table-body">
@@ -34,10 +34,14 @@
             <h2>Ask Me Anything</h2>
             <br>
             <form action="/ask" method="POST">
-                <textarea name="userInput" placeholder="Type your message..." required></textarea>
+                <div style="display: flex; align-items: center;">
+                    <textarea id="userInput" name="userInput" placeholder="Type your message..." required></textarea>
+                    <button type="button" id="micButton" onclick="startListening()" style="margin-left: 10px;">🎤</button>
+                </div>
                 <button type="submit">ASK</button>
             </form>
             <br>
+
             <!-- Display the response from the bot (if any) -->
            {% if bot_response and user_response %}
             <div class="response">
@@ -55,28 +59,68 @@
         </div>
 
         <!-- About Section -->
-        <!-- About Section -->
-<div class="section about-section">
-    <h2>About This Bot</h2>
-    <p><strong>AI Chat Assistant</strong> is a smart chatbot designed to help you find quick answers, generate ideas, and solve problems efficiently.</p>
+        <div class="section about-section">
+            <h2>About This Bot</h2>
+            <p><strong>AI Chat Assistant</strong> is a smart chatbot designed to help you find quick answers, generate ideas, and solve problems efficiently.</p>
 
-    <h3>🚀 How It Works?</h3>
-    <p>Simply type your question in the chat box and get an instant response powered by AI.</p>
+            <h3>🚀 How It Works?</h3>
+            <p>Simply type your question in the chat box or use the mic to speak, and get an instant response powered by AI.</p>
 
-    <h3>✨ Key Features</h3>
-    <ul>
-        <li>🔹 Provides instant responses to queries</li>
-        <li>🔹 Supports multiple topics and categories</li>
-        <li>🔹 Keeps track of your recent searches</li>
-        <li>🔹 Easy-to-use, friendly chat interface</li>
-    </ul>
+            <h3>✨ Key Features</h3>
+            <ul>
+                <li>🔹 Provides instant responses to queries</li>
+                <li>🔹 Supports multiple topics and categories</li>
+                <li>🔹 Keeps track of your recent searches</li>
+                <li>🔹 Easy-to-use, friendly chat interface</li>
+            </ul>
 
-    <h3>💡 How to Use?</h3>
-    <p>🔸 Ask questions about any topic.<br>🔸 Use clear and specific words for better answers.<br>🔸 Review your previous searches for quick reference.</p>
+            <h3>💡 How to Use?</h3>
+            <p>🔸 Ask questions about any topic.<br>🔸 Use clear and specific words for better answers.<br>🔸 Review your previous searches for quick reference.</p>
 
-    <p><strong>Start Exploring Now!</strong> Ask your first question and let AI do the rest. 🚀</p>
-</div>
-
+            <p><strong>Start Exploring Now!</strong> Ask your first question and let AI do the rest. 🚀</p>
+        </div>
     </div>
+
+    <!-- JavaScript for Speech Recognition -->
+    <script>
+        let recognition;
+        let isListening = false;
+
+        function startListening() {
+             if (!recognition) {
+                   recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                    recognition.lang = 'en-US'; // Change this if needed
+
+             recognition.onstart = function() {
+                  console.log("Listening...");
+                  document.getElementById("micButton").innerText = "🎙 Listening...";
+                };
+
+              recognition.onresult = function(event) {
+                    let transcript = event.results[0][0].transcript;
+                  document.getElementById("userInput").value = transcript; // Place text in textarea
+              };
+
+             recognition.onerror = function(event) {
+                 console.error("Error occurred in recognition: ", event.error);
+                  document.getElementById("micButton").innerText = "🎤";
+           };
+
+              recognition.onend = function() {
+                   console.log("Stopped listening.");
+                   document.getElementById("micButton").innerText = "🎤";
+                 isListening = false;
+                };
+             }
+
+              if (!isListening) {
+                recognition.start();
+                  isListening = true;
+                 } else {
+               recognition.stop();
+         }
+        }
+    </script>
+
 </body>
 </html>
