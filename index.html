@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI ChatBot</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .highlight { background-color: yellow; }
+    </style>
 </head>
 <body>
     <div class="container">
-        <!-- Table Section -->
         <div class="section table-container">
             <h2>Your Activities</h2>
             <table>
@@ -20,16 +22,15 @@
                 </thead>
                 <tbody id="table-body">
                 {% for activity in activity_log %}
-                        <tr>
-                            <td>{{ activity.s_no }}</td>
-                            <td>{{ activity.message }}</td>
-                        </tr>
+                    <tr>
+                        <td>{{ activity.s_no }}</td>
+                        <td>{{ activity.message }}</td>
+                    </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
 
-        <!-- Chat Input Section -->
         <div class="section textarea-container">
             <h2>Ask Me Anything</h2>
             <br>
@@ -42,27 +43,28 @@
             </form>
             <br>
 
-            <!-- Display the response from the bot (if any) -->
-           {% if bot_response and user_response %}
+            {% if bot_response and user_response %}
             <div class="response">
-                <p><strong>🙋 ️{{ user_response }}</strong> </p>
+                <p><strong>🙋 ️{{ user_response }}</strong></p>
                 <br>
                 <p><strong>🤖 Bot :</strong></p>
                 <br>
-                 <p>
-                     {% for line in bot_response.split('\n') %}
-                            {{ line | safe }}<br>
+
+                    {% for line in bot_response.split('\n') %}
+                        <span class="response-line">{{ line | safe }}</span><br>
                     {% endfor %}
-                    </p>
-                </div>
+
+                <button id="speakBtn" data-response="{{ bot_response }}" onclick="speakResponse()">🔊 Speak</button>
+                <button id="pauseBtn" onclick="pauseSpeech()" style="display: none;">⏸️ Pause</button>
+                <button id="resumeBtn" onclick="resumeSpeech()" style="display: none;">▶️ Resume</button>
+                <button id="stopBtn" onclick="stopSpeech()" style="display: none;">⏹️ Stop</button>
+            </div>
             {% endif %}
         </div>
 
-        <!-- About Section -->
         <div class="section about-section">
             <h2>About This Bot</h2>
             <p><strong>AI Chat Assistant</strong> is a smart chatbot designed to help you find quick answers, generate ideas, and solve problems efficiently.</p>
-
             <h3>🚀 How It Works?</h3>
             <p>Simply type your question in the chat box or use the mic to speak, and get an instant response powered by AI.</p>
 
@@ -81,46 +83,105 @@
         </div>
     </div>
 
-    <!-- JavaScript for Speech Recognition -->
     <script>
         let recognition;
         let isListening = false;
 
         function startListening() {
-             if (!recognition) {
-                   recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-                    recognition.lang = 'en-US'; // Change this if needed
-
-             recognition.onstart = function() {
-                  console.log("Listening...");
-                  document.getElementById("micButton").innerText = "🎙 Listening...";
+            if (!recognition) {
+                recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.lang = 'en-US';
+                recognition.onstart = function() {
+                    document.getElementById("micButton").innerText = "🎙 Listening...";
                 };
-
-              recognition.onresult = function(event) {
-                    let transcript = event.results[0][0].transcript;
-                  document.getElementById("userInput").value = transcript; // Place text in textarea
-              };
-
-             recognition.onerror = function(event) {
-                 console.error("Error occurred in recognition: ", event.error);
-                  document.getElementById("micButton").innerText = "🎤";
-           };
-
-              recognition.onend = function() {
-                   console.log("Stopped listening.");
-                   document.getElementById("micButton").innerText = "🎤";
-                 isListening = false;
+                recognition.onresult = function(event) {
+                    document.getElementById("userInput").value = event.results[0][0].transcript;
                 };
-             }
-
-              if (!isListening) {
+                recognition.onend = function() {
+                    document.getElementById("micButton").innerText = "🎤";
+                    isListening = false;
+                };
+            }
+            if (!isListening) {
                 recognition.start();
-                  isListening = true;
-                 } else {
-               recognition.stop();
-         }
+                isListening = true;
+            } else {
+                recognition.stop();
+            }
         }
-    </script>
 
+     let synth = window.speechSynthesis;
+let utterance;
+let voices = [];
+
+function speakResponse() {
+    let botResponse = document.getElementById("speakBtn").getAttribute("data-response");
+
+    if (!utterance || synth.speaking === false) {
+        utterance = new SpeechSynthesisUtterance(botResponse);
+        utterance.volume = 1.0; // Increase volume
+
+        let speakButton = document.getElementById("speakBtn");
+        let pauseButton = document.getElementById("pauseBtn");
+        let resumeButton = document.getElementById("resumeBtn");
+        let stopButton = document.getElementById("stopBtn");
+
+        // Show buttons when speaking starts
+        pauseButton.style.display = "inline-block";
+        stopButton.style.display = "inline-block";
+        resumeButton.style.display = "none"; // Hide resume initially
+
+        speakButton.innerText = "🔊 Speaking...";
+
+        utterance.onend = function () {
+            speakButton.innerText = "🔊 Speak";
+
+            // Hide buttons after speaking ends
+            pauseButton.style.display = "none";
+            resumeButton.style.display = "none";
+            stopButton.style.display = "none";
+        };
+
+        synth.speak(utterance);
+    } else if (synth.paused) {
+        synth.resume();
+        isPaused = false;
+    }
+}
+
+function pauseSpeech() {
+    if (synth.speaking && !synth.paused) {
+        synth.pause();
+        isPaused = true;
+        document.getElementById("speakBtn").innerText = "⏸️ Paused";
+        document.getElementById("resumeBtn").style.display = "inline-block";
+        document.getElementById("pauseBtn").style.display = "none";
+    }
+}
+
+function resumeSpeech() {
+    if (synth.paused) {
+        synth.resume();
+        isPaused = false;
+        document.getElementById("speakBtn").innerText = "🔊 Speaking...";
+        document.getElementById("pauseBtn").style.display = "inline-block";
+        document.getElementById("resumeBtn").style.display = "none";
+    }
+}
+
+function stopSpeech() {
+    if (synth.speaking || synth.paused) {
+        synth.cancel();
+        isPaused = false;
+        document.getElementById("speakBtn").innerText = "🔊 Speak";
+
+        // Hide buttons after stopping
+        document.getElementById("pauseBtn").style.display = "none";
+        document.getElementById("resumeBtn").style.display = "none";
+        document.getElementById("stopBtn").style.display = "none";
+    }
+}
+
+    </script>
 </body>
 </html>
