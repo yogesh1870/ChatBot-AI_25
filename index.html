@@ -96,8 +96,19 @@
         let isListening = false;
         let selectedLanguage = 'en-US'; // Default language is English
         let synth = window.speechSynthesis;
+        let voices = [];
         let utterance;
         let isSpeaking = false; // Track whether the speech is ongoing
+
+        // Fetch voices after they are loaded
+        function loadVoices() {
+            voices = synth.getVoices();
+        }
+
+        loadVoices();  // Load voices initially
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;  // Ensure voices are loaded when changed
+        }
 
         function startLanguageSelection() {
             // Show language selection modal
@@ -150,11 +161,13 @@
             // Create new utterance with the cleaned response
             utterance = new SpeechSynthesisUtterance(cleanResponse);
 
-            // Check the selected language and set TTS language accordingly
+            // Select the correct voice based on selected language
             if (selectedLanguage === 'ta-IN') {
                 utterance.lang = 'ta-IN';  // Set Tamil language for TTS
+                utterance.voice = voices.find(voice => voice.lang === 'ta-IN') || voices[0];
             } else {
                 utterance.lang = 'en-US';  // Default to English language for TTS
+                utterance.voice = voices.find(voice => voice.lang === 'en-US') || voices[0];
             }
 
             // Ensure the TTS volume and rate are adjusted for clarity
@@ -174,7 +187,7 @@
                 // Reset button visibility after speaking ends
                 document.getElementById("pauseBtn").style.display = "none";
                 document.getElementById("stopBtn").style.display = "none";
-                document.getElementById("speakBtn").style.display = "inline-block"; // Show speak button
+                document.getElementById("speakBtn").style.display = "inline-block";
                 isSpeaking = false;
             };
         }
