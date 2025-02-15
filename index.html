@@ -95,6 +95,9 @@
         let recognition;
         let isListening = false;
         let selectedLanguage = 'en-US'; // Default language is English
+        let synth = window.speechSynthesis;
+        let utterance;
+        let isSpeaking = false; // Track whether the speech is ongoing
 
         function startLanguageSelection() {
             // Show language selection modal
@@ -133,56 +136,71 @@
             }
         }
 
-        let synth = window.speechSynthesis;
-let utterance;
+        function cleanTextForSpeech(text) {
+            // Remove punctuation marks or unwanted characters
+            return text.replace(/[.,!?;:"(){}[\]]/g, '').trim();
+        }
 
-function speakResponse() {
-    let botResponse = document.getElementById("speakBtn").getAttribute("data-response");
+        function speakResponse() {
+            let botResponse = document.getElementById("speakBtn").getAttribute("data-response");
 
-    // Create new utterance
-    utterance = new SpeechSynthesisUtterance(botResponse);
+            // Clean the response text to avoid special characters
+            let cleanResponse = cleanTextForSpeech(botResponse);
 
-    // Check the selected language and set TTS language accordingly
-    if (selectedLanguage === 'ta-IN') {
-        utterance.lang = 'ta-IN';  // Set Tamil language for TTS
-    } else {
-        utterance.lang = 'en-US';  // Default to English language for TTS
-    }
+            // Create new utterance with the cleaned response
+            utterance = new SpeechSynthesisUtterance(cleanResponse);
 
-    // Ensure the TTS volume and rate are adjusted for clarity
-    utterance.volume = 1.0; // Full volume
-    utterance.rate = 1; // Normal speed
+            // Check the selected language and set TTS language accordingly
+            if (selectedLanguage === 'ta-IN') {
+                utterance.lang = 'ta-IN';  // Set Tamil language for TTS
+            } else {
+                utterance.lang = 'en-US';  // Default to English language for TTS
+            }
 
-    // Check if the desired language is available
-    const availableVoices = synth.getVoices();
-    const tamilVoice = availableVoices.find(voice => voice.lang === 'ta-IN');
+            // Ensure the TTS volume and rate are adjusted for clarity
+            utterance.volume = 1.0; // Full volume
+            utterance.rate = 1; // Normal speed
 
-    if (tamilVoice) {
-        utterance.voice = tamilVoice;  // Use Tamil voice if available
-    } else {
-        console.warn("Tamil voice not available, defaulting to system voice.");
-    }
+            // Speak the response
+            synth.speak(utterance);
 
-    // Speak the response
-    synth.speak(utterance);
-}
+            // Toggle the visibility of buttons
+            document.getElementById("pauseBtn").style.display = "inline-block";
+            document.getElementById("stopBtn").style.display = "inline-block";
+            document.getElementById("speakBtn").style.display = "none"; // Hide speak button
+            isSpeaking = true;
 
+            utterance.onend = function() {
+                // Reset button visibility after speaking ends
+                document.getElementById("pauseBtn").style.display = "none";
+                document.getElementById("stopBtn").style.display = "none";
+                document.getElementById("speakBtn").style.display = "inline-block"; // Show speak button
+                isSpeaking = false;
+            };
+        }
 
         function pauseSpeech() {
             if (synth.speaking && !synth.paused) {
                 synth.pause();
+                document.getElementById("pauseBtn").innerText = "▶️ Resume";
             }
         }
 
         function resumeSpeech() {
             if (synth.paused) {
                 synth.resume();
+                document.getElementById("pauseBtn").innerText = "⏸️ Pause";
             }
         }
 
         function stopSpeech() {
             if (synth.speaking || synth.paused) {
                 synth.cancel();
+                // Reset button visibility after stopping
+                document.getElementById("pauseBtn").style.display = "none";
+                document.getElementById("stopBtn").style.display = "none";
+                document.getElementById("speakBtn").style.display = "inline-block";
+                isSpeaking = false;
             }
         }
     </script>
