@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         .highlight { background-color: yellow; }
+        .language-selection { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); z-index: 9999; }
+        .language-selection button { padding: 10px 20px; margin: 10px; cursor: pointer; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 9998; }
     </style>
 </head>
 <body>
@@ -37,7 +40,7 @@
             <form action="/ask" method="POST">
                 <div style="display: flex; align-items: center;">
                     <textarea id="userInput" name="userInput" placeholder="Type your message..." required></textarea>
-                    <button type="button" id="micButton" onclick="startListening()" style="margin-left: 10px;">🎤</button>
+                    <button type="button" id="micButton" onclick="startLanguageSelection()" style="margin-left: 10px;">🎤</button>
                 </div>
                 <button type="submit">ASK</button>
             </form>
@@ -49,11 +52,9 @@
                 <br>
                 <p><strong>🤖 Bot :</strong></p>
                 <br>
-
                     {% for line in bot_response.split('\n') %}
                         <span class="response-line">{{ line | safe }}</span><br>
                     {% endfor %}
-
                 <button id="speakBtn" data-response="{{ bot_response }}" onclick="speakResponse()">🔊 Speak</button>
                 <button id="pauseBtn" onclick="pauseSpeech()" style="display: none;">⏸️ Pause</button>
                 <button id="resumeBtn" onclick="resumeSpeech()" style="display: none;">▶️ Resume</button>
@@ -67,7 +68,6 @@
             <p><strong>AI Chat Assistant</strong> is a smart chatbot designed to help you find quick answers, generate ideas, and solve problems efficiently.</p>
             <h3>🚀 How It Works?</h3>
             <p>Simply type your question in the chat box or use the mic to speak, and get an instant response powered by AI.</p>
-
             <h3>✨ Key Features</h3>
             <ul>
                 <li>🔹 Provides instant responses to queries</li>
@@ -83,14 +83,37 @@
         </div>
     </div>
 
+    <!-- Language Selection Modal -->
+    <div class="overlay" id="overlay"></div>
+    <div class="language-selection" id="language-selection">
+        <h3>Select Language</h3>
+        <button onclick="setLanguage('en-US')">English</button>
+        <button onclick="setLanguage('ta-IN')">Tamil</button>
+    </div>
+
     <script>
         let recognition;
         let isListening = false;
+        let selectedLanguage = 'en-US'; // Default language is English
+
+        function startLanguageSelection() {
+            // Show language selection modal
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('language-selection').style.display = 'block';
+        }
+
+        function setLanguage(language) {
+            // Set the selected language and close the modal
+            selectedLanguage = language;
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('language-selection').style.display = 'none';
+            startListening();  // Start speech recognition with the selected language
+        }
 
         function startListening() {
             if (!recognition) {
                 recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-                recognition.lang = 'en-US';
+                recognition.lang = selectedLanguage;  // Use the selected language
                 recognition.onstart = function() {
                     document.getElementById("micButton").innerText = "🎙 Listening...";
                 };
@@ -110,78 +133,58 @@
             }
         }
 
-     let synth = window.speechSynthesis;
+        let synth = window.speechSynthesis;
 let utterance;
-let voices = [];
 
 function speakResponse() {
     let botResponse = document.getElementById("speakBtn").getAttribute("data-response");
 
-    if (!utterance || synth.speaking === false) {
-        utterance = new SpeechSynthesisUtterance(botResponse);
-        utterance.volume = 1.0; // Increase volume
+    // Create new utterance
+    utterance = new SpeechSynthesisUtterance(botResponse);
 
-        let speakButton = document.getElementById("speakBtn");
-        let pauseButton = document.getElementById("pauseBtn");
-        let resumeButton = document.getElementById("resumeBtn");
-        let stopButton = document.getElementById("stopBtn");
-
-        // Show buttons when speaking starts
-        pauseButton.style.display = "inline-block";
-        stopButton.style.display = "inline-block";
-        resumeButton.style.display = "none"; // Hide resume initially
-
-        speakButton.innerText = "🔊 Speaking...";
-
-        utterance.onend = function () {
-            speakButton.innerText = "🔊 Speak";
-
-            // Hide buttons after speaking ends
-            pauseButton.style.display = "none";
-            resumeButton.style.display = "none";
-            stopButton.style.display = "none";
-        };
-
-        synth.speak(utterance);
-    } else if (synth.paused) {
-        synth.resume();
-        isPaused = false;
+    // Check the selected language and set TTS language accordingly
+    if (selectedLanguage === 'ta-IN') {
+        utterance.lang = 'ta-IN';  // Set Tamil language for TTS
+    } else {
+        utterance.lang = 'en-US';  // Default to English language for TTS
     }
+
+    // Ensure the TTS volume and rate are adjusted for clarity
+    utterance.volume = 1.0; // Full volume
+    utterance.rate = 1; // Normal speed
+
+    // Check if the desired language is available
+    const availableVoices = synth.getVoices();
+    const tamilVoice = availableVoices.find(voice => voice.lang === 'ta-IN');
+
+    if (tamilVoice) {
+        utterance.voice = tamilVoice;  // Use Tamil voice if available
+    } else {
+        console.warn("Tamil voice not available, defaulting to system voice.");
+    }
+
+    // Speak the response
+    synth.speak(utterance);
 }
 
-function pauseSpeech() {
-    if (synth.speaking && !synth.paused) {
-        synth.pause();
-        isPaused = true;
-        document.getElementById("speakBtn").innerText = "⏸️ Paused";
-        document.getElementById("resumeBtn").style.display = "inline-block";
-        document.getElementById("pauseBtn").style.display = "none";
-    }
-}
 
-function resumeSpeech() {
-    if (synth.paused) {
-        synth.resume();
-        isPaused = false;
-        document.getElementById("speakBtn").innerText = "🔊 Speaking...";
-        document.getElementById("pauseBtn").style.display = "inline-block";
-        document.getElementById("resumeBtn").style.display = "none";
-    }
-}
+        function pauseSpeech() {
+            if (synth.speaking && !synth.paused) {
+                synth.pause();
+            }
+        }
 
-function stopSpeech() {
-    if (synth.speaking || synth.paused) {
-        synth.cancel();
-        isPaused = false;
-        document.getElementById("speakBtn").innerText = "🔊 Speak";
+        function resumeSpeech() {
+            if (synth.paused) {
+                synth.resume();
+            }
+        }
 
-        // Hide buttons after stopping
-        document.getElementById("pauseBtn").style.display = "none";
-        document.getElementById("resumeBtn").style.display = "none";
-        document.getElementById("stopBtn").style.display = "none";
-    }
-}
-
+        function stopSpeech() {
+            if (synth.speaking || synth.paused) {
+                synth.cancel();
+            }
+        }
     </script>
 </body>
 </html>
