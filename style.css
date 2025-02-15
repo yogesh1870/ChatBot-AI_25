@@ -13,6 +13,9 @@
     height: 100vh; /* Keeps full screen */
     margin: auto;
     gap: 20px;
+
+
+
 }
 
 /* Table Section (Reduced Width) */
@@ -22,6 +25,12 @@
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+
+     /* Set max height and enable scrolling */
+    display: flex;
+    flex-direction: column;
+    max-height: 100vh; /* Limits height to prevent overflow */
+    overflow-y: auto;
 }
 
 /* Table Styles */
