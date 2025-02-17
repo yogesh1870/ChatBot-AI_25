@@ -56,9 +56,6 @@
                         <span class="response-line">{{ line | safe }}</span><br>
                     {% endfor %}
                 <button id="speakBtn" data-response="{{ bot_response }}" onclick="speakResponse()">🔊 Speak</button>
-                <button id="pauseBtn" onclick="pauseSpeech()" style="display: none;">⏸️ Pause</button>
-                <button id="resumeBtn" onclick="resumeSpeech()" style="display: none;">▶️ Resume</button>
-                <button id="stopBtn" onclick="stopSpeech()" style="display: none;">⏹️ Stop</button>
             </div>
             {% endif %}
         </div>
@@ -153,69 +150,49 @@
         }
 
         function speakResponse() {
-            let botResponse = document.getElementById("speakBtn").getAttribute("data-response");
+    let botResponse = document.getElementById("speakBtn").getAttribute("data-response");
 
-            // Clean the response text to avoid special characters
-            let cleanResponse = cleanTextForSpeech(botResponse);
+    // Clean the response text to avoid special characters
+    let cleanResponse = cleanTextForSpeech(botResponse);
 
-            // Create new utterance with the cleaned response
-            utterance = new SpeechSynthesisUtterance(cleanResponse);
+    // Create new utterance with the cleaned response
+    utterance = new SpeechSynthesisUtterance(cleanResponse);
 
-            // Select the correct voice based on selected language
-            if (selectedLanguage === 'ta-IN') {
-                utterance.lang = 'ta-IN';  // Set Tamil language for TTS
-                utterance.voice = voices.find(voice => voice.lang === 'ta-IN') || voices[0];
-            } else {
-                utterance.lang = 'en-US';  // Default to English language for TTS
-                utterance.voice = voices.find(voice => voice.lang === 'en-US') || voices[0];
-            }
-
-            // Ensure the TTS volume and rate are adjusted for clarity
-            utterance.volume = 1.0; // Full volume
-            utterance.rate = 1; // Normal speed
-
-            // Speak the response
-            synth.speak(utterance);
-
-            // Toggle the visibility of buttons
-            document.getElementById("pauseBtn").style.display = "inline-block";
-            document.getElementById("stopBtn").style.display = "inline-block";
-            document.getElementById("speakBtn").style.display = "none"; // Hide speak button
-            isSpeaking = true;
-
-            utterance.onend = function() {
-                // Reset button visibility after speaking ends
-                document.getElementById("pauseBtn").style.display = "none";
-                document.getElementById("stopBtn").style.display = "none";
-                document.getElementById("speakBtn").style.display = "inline-block";
-                isSpeaking = false;
-            };
+    // If bot response is in Tamil, use Tamil voice
+    if (selectedLanguage === 'ta-IN') {
+        let tamilVoice = voices.find(voice => voice.lang === 'ta-IN');
+        if (tamilVoice) {
+            utterance.lang = 'ta-IN';  // Set Tamil language for TTS
+            utterance.voice = tamilVoice;
+        } else {
+            // If Tamil voice is not available, fall back to English
+            utterance.lang = 'en-US';
+            utterance.voice = voices.find(voice => voice.lang === 'en-US') || voices[0];
         }
+    } else {
+        // If the selected language is not Tamil, use English
+        utterance.lang = 'en-US';  // Default to English language for TTS
+        utterance.voice = voices.find(voice => voice.lang === 'en-US') || voices[0];
+    }
 
-        function pauseSpeech() {
-            if (synth.speaking && !synth.paused) {
-                synth.pause();
-                document.getElementById("pauseBtn").innerText = "▶️ Resume";
-            }
-        }
+    // Ensure the TTS volume and rate are adjusted for clarity
+    utterance.volume = 1.0; // Full volume
+    utterance.rate = 1; // Normal speed
 
-        function resumeSpeech() {
-            if (synth.paused) {
-                synth.resume();
-                document.getElementById("pauseBtn").innerText = "⏸️ Pause";
-            }
-        }
+    // Speak the response
+    synth.speak(utterance);
 
-        function stopSpeech() {
-            if (synth.speaking || synth.paused) {
-                synth.cancel();
-                // Reset button visibility after stopping
-                document.getElementById("pauseBtn").style.display = "none";
-                document.getElementById("stopBtn").style.display = "none";
-                document.getElementById("speakBtn").style.display = "inline-block";
-                isSpeaking = false;
-            }
-        }
+    // Hide the Speak button after speaking starts
+    document.getElementById("speakBtn").style.display = "none";
+    isSpeaking = true;
+
+    utterance.onend = function() {
+        // Reset button visibility after speaking ends
+        document.getElementById("speakBtn").style.display = "inline-block";
+        isSpeaking = false;
+    };
+}
+
     </script>
 </body>
 </html>
