@@ -91,7 +91,7 @@
     <script>
         let recognition;
         let isListening = false;
-        let selectedLanguage = 'ta-IN';
+
         let synth = window.speechSynthesis;
         let voices = [];
         let utterance;
@@ -145,38 +145,60 @@
 
 }
 
-function speakResponse() {
-    let botResponse = document.getElementById("speakBtn").getAttribute("data-response");
-    let utterance = new SpeechSynthesisUtterance(botResponse);
+function detectLanguage(text) {
 
-    // Load voices
-    let voices = speechSynthesis.getVoices();
+            let tamilRegex = /[஀-௿]/;
+            let isTamil = tamilRegex.test(text);
+            return isTamil ? 'ta-IN':'en-US';
 
-    if (selectedLanguage === "ta-IN") {
-        let tamilVoice = voices.find(voice => voice.lang === "ta-IN" || voice.name.includes("Valluvar"));
-        if (tamilVoice) {
-            utterance.voice = tamilVoice;
-        } else {
-            console.warn("Tamil voice not found. Using default voice.");
         }
-        utterance.lang = 'ta-IN';
-    } else {
-        let englishVoice = voices.find(voice => voice.lang === "en-US");
-        if (englishVoice) {
-            utterance.voice = englishVoice;
-        } else {
-            console.warn("English voice not found. Using default voice.");
+
+        function speakResponse() {
+
+            let botResponse = document.getElementById("speakBtn").getAttribute("data-response");
+            let utterance = new SpeechSynthesisUtterance(botResponse);
+            let textContent = document.getElementById("userInput").value.trim();
+            let detectedLanguage = detectLanguage(textContent);
+            let voices = speechSynthesis.getVoices();
+
+            if (detectedLanguage === "en-US") {
+
+            let tamilVoice = voices.find(voice => voice.lang === "ta-IN" || voice.name.includes("Valluvar"));
+                if (tamilVoice) {
+                    utterance.voice = tamilVoice;
+                } else {
+                    console.warn("Tamil voice not found. Using default voice.");
+                }
+                utterance.lang = 'ta-IN';
+                }
+                else {
+                let englishVoice = voices.find(voice => voice.lang === "en-US");
+                if (englishVoice) {
+                    utterance.voice = englishVoice;
+                } else {
+                    console.warn("English voice not found. Using default voice.");
+                }
+                utterance.lang = "en-US";
+               }
+
+            window.speechSynthesis.speak(utterance);
+
+              if (!isSpeaking) {
+                speechSynthesis.speak(utterance);
+                speakBtn.innerText = "⏹ Stop";
+                isSpeaking = true;
+                utterance.onend = function () {
+                    speakBtn.innerText = "🔊 Speak";
+                    isSpeaking = false;
+                };
+            } else {
+                speechSynthesis.cancel();
+                speakBtn.innerText = "🔊 Speak";
+                isSpeaking = false;
+            }
         }
-        utterance.lang = "en-US";
-    }
 
-    window.speechSynthesis.speak(utterance);
-}
 
-// Ensure voices are loaded before use
-window.speechSynthesis.onvoiceschanged = function () {
-    loadVoices();
-};
 
 
     </script>
