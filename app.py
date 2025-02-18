@@ -2,6 +2,8 @@ from flask import Flask, render_template, request
 import google.generativeai as ai
 import markdown
 from google.generativeai.types.generation_types import StopCandidateException  # Import exception
+from langdetect import detect
+
 
 app = Flask(__name__)
 
@@ -159,9 +161,15 @@ def ask():
             except Exception as e:
                 bot_response = "Sorry puriyala !...Konjam simple ah pesunga...Adha enakku theriyala ! :("
 
+        try:
+            detected_lang = detect(bot_response)
+            bot_response_language = "ta-IN" if detected_lang == "ta" else "en-US"
+        except:
+            bot_response_language = "Unknown"
+
     activity_log.append({"s_no": len(activity_log) + 1, "message": user_message})
 
-    return render_template('index.html', bot_response=bot_response, user_response=current_msg, activity_log=activity_log)
+    return render_template('index.html', bot_response=bot_response, user_response=current_msg, activity_log=activity_log, bot_response_language=bot_response_language)
 
 
 if __name__ == '__main__':
