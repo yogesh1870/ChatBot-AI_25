@@ -158,10 +158,10 @@ function detectLanguage(text) {
             let botResponse = document.getElementById("speakBtn").getAttribute("data-response");
             let utterance = new SpeechSynthesisUtterance(botResponse);
             let textContent = document.getElementById("userInput").value.trim();
-            let detectedLanguage = detectLanguage(textContent);
+            let detectedLanguage = "{{bot_response_language}}";
             let voices = speechSynthesis.getVoices();
 
-            if (detectedLanguage === "en-US") {
+            if (detectedLanguage === "ta-IN") {
 
             let tamilVoice = voices.find(voice => voice.lang === "ta-IN" || voice.name.includes("Valluvar"));
                 if (tamilVoice) {
