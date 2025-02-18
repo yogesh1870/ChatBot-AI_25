@@ -91,7 +91,7 @@
     <script>
         let recognition;
         let isListening = false;
-        let selectedLanguage = 'en-US'; // Default language is English
+        let selectedLanguage = 'ta-IN';
         let synth = window.speechSynthesis;
         let voices = [];
         let utterance;
@@ -99,65 +99,85 @@
 
         // Fetch voices after they are loaded
         function loadVoices() {
-            voices = synth.getVoices();
+              voices = synth.getVoices();
         }
 
         loadVoices();  // Load voices initially
         if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = loadVoices;  // Ensure voices are loaded when changed
+              speechSynthesis.onvoiceschanged = loadVoices;  // Ensure voices are loaded when changed
         }
 
         function startLanguageSelection() {
-            // Show language selection modal
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('language-selection').style.display = 'block';
+             // Show language selection modal
+                   document.getElementById('overlay').style.display = 'block';
+                   document.getElementById('language-selection').style.display = 'block';
         }
 
         function setLanguage(language) {
-            // Set the selected language and close the modal
-            selectedLanguage = language;
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('language-selection').style.display = 'none';
-            startListening();    // Start speech recognition with the selected language
+              // Set the selected language and close the modal
+                 selectedLanguage = language;
+                 document.getElementById('overlay').style.display = 'none';
+                 document.getElementById('language-selection').style.display = 'none';
+                 startListening();
         }
 
-        function startListening() {
+           function startListening() {
             if (!recognition) {
-                recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-                recognition.lang = selectedLanguage;  // Use the selected language
-                recognition.onstart = function() {
-                    document.getElementById("micButton").innerText = "🎙 Listening...";
-                };
-                recognition.onresult = function(event) {
-                    document.getElementById("userInput").value = event.results[0][0].transcript;
-                };
-                recognition.onend = function() {
-                    document.getElementById("micButton").innerText = "🎤";
-                    isListening = false;
-                };
-            }
-            if (!isListening) {
-                recognition.start();
-                isListening = true;
-            } else {
-                recognition.stop();
-            }
-            speakResponse();
+                  recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                  recognition.lang = selectedLanguage;  // Use the selected language
+                  recognition.onstart = function () {
+                   document.getElementById("micButton").innerText = "🎙 Listening...";
+             };
+                 recognition.onresult = function (event) {
+                  document.getElementById("userInput").value = event.results[0][0].transcript;
+         };
+        recognition.onend = function () {
+            document.getElementById("micButton").innerText = "🎤";
+            isListening = false;
+        };
+    }
+    if (!isListening) {
+        recognition.start();
+        isListening = true;
+    } else {
+        recognition.stop();
+    }
+
+}
+
+function speakResponse() {
+    let botResponse = document.getElementById("speakBtn").getAttribute("data-response");
+    let utterance = new SpeechSynthesisUtterance(botResponse);
+
+    // Load voices
+    let voices = speechSynthesis.getVoices();
+
+    if (selectedLanguage === "ta-IN") {
+        let tamilVoice = voices.find(voice => voice.lang === "ta-IN" || voice.name.includes("Valluvar"));
+        if (tamilVoice) {
+            utterance.voice = tamilVoice;
+        } else {
+            console.warn("Tamil voice not found. Using default voice.");
         }
-
-        function cleanTextForSpeech(text) {
-            // Remove punctuation marks or unwanted characters
-            return text.replace(/[.,!?;:"(){}[\]]/g, '').trim();
+        utterance.lang = 'ta-IN';
+    } else {
+        let englishVoice = voices.find(voice => voice.lang === "en-US");
+        if (englishVoice) {
+            utterance.voice = englishVoice;
+        } else {
+            console.warn("English voice not found. Using default voice.");
         }
+        utterance.lang = "en-US";
+    }
 
-        function speakResponse() {
-                let botResponse = document.getElementById("speakBtn").getAttribute("data-response");
-                const utterance = new SpeechSynthesisUtterance(botResponse);
-                utterance.lang = selectedLanguage ;
-                window.speechSynthesis.speak(utterance);
+    window.speechSynthesis.speak(utterance);
+}
 
+// Ensure voices are loaded before use
+window.speechSynthesis.onvoiceschanged = function () {
+    loadVoices();
+};
 
-        }
 
     </script>
 </body>
