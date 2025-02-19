@@ -5,12 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI ChatBot</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        .highlight { background-color: yellow; }
-        .language-selection { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); z-index: 9999; }
-        .language-selection button { padding: 10px 20px; margin: 10px; cursor: pointer; }
-        .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 9998; }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -91,7 +85,6 @@
     <script>
         let recognition;
         let isListening = false;
-
         let synth = window.speechSynthesis;
         let voices = [];
         let utterance;
@@ -144,46 +137,31 @@
     }
 
 }
-
-function detectLanguage(text) {
-
-            let tamilRegex = /[஀-௿]/;
-            let isTamil = tamilRegex.test(text);
-            return isTamil ? 'ta-IN':'en-US';
-
+function speakResponse() {
+    let botResponse = document.getElementById("speakBtn").getAttribute("data-response");
+    let utterance = new SpeechSynthesisUtterance(botResponse);
+    let detectedLanguage = "{{bot_response_language}}";
+    let voices = speechSynthesis.getVoices();
+    if (detectedLanguage === "ta-IN") {
+        let tamilVoice = voices.find(voice => voice.lang === "ta-IN" || voice.name.includes("Valluvar"));
+        if (tamilVoice) {
+            utterance.voice = tamilVoice;
+        } else {
+            console.warn("Tamil voice not found. Using default voice.");
         }
-
-        function speakResponse() {
-
-            let botResponse = document.getElementById("speakBtn").getAttribute("data-response");
-            let utterance = new SpeechSynthesisUtterance(botResponse);
-            let textContent = document.getElementById("userInput").value.trim();
-            let detectedLanguage = "{{bot_response_language}}";
-            let voices = speechSynthesis.getVoices();
-
-            if (detectedLanguage === "ta-IN") {
-
-            let tamilVoice = voices.find(voice => voice.lang === "ta-IN" || voice.name.includes("Valluvar"));
-                if (tamilVoice) {
-                    utterance.voice = tamilVoice;
-                } else {
-                    console.warn("Tamil voice not found. Using default voice.");
-                }
-                utterance.lang = 'ta-IN';
-                }
-                else {
-                let englishVoice = voices.find(voice => voice.lang === "en-US");
-                if (englishVoice) {
-                    utterance.voice = englishVoice;
-                } else {
-                    console.warn("English voice not found. Using default voice.");
-                }
-                utterance.lang = "en-US";
-               }
-
-            window.speechSynthesis.speak(utterance);
-
-              if (!isSpeaking) {
+        utterance.lang = 'ta-IN';
+        }
+        else {
+           let englishVoice = voices.find(voice => voice.lang === "en-US");
+           if (englishVoice) {
+               utterance.voice = englishVoice;
+           } else {
+               console.warn("English voice not found. Using default voice.");
+           }
+           utterance.lang = "en-US";
+        }
+        window.speechSynthesis.speak(utterance);
+        if (!isSpeaking) {
                 speechSynthesis.speak(utterance);
                 speakBtn.innerText = "⏹ Stop";
                 isSpeaking = true;
@@ -197,10 +175,6 @@ function detectLanguage(text) {
                 isSpeaking = false;
             }
         }
-
-
-
-
-    </script>
+</script>
 </body>
 </html>
