@@ -1,1 +1,180 @@
-fds
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI ChatBot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="section table-container">
+            <h2>Your Activities</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th id="s_no">S.No</th>
+                        <th>Recently Searched Topic</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                {% for activity in activity_log %}
+                    <tr>
+                        <td>{{ activity.s_no }}</td>
+                        <td>{{ activity.message }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section textarea-container">
+            <h2>Ask Me Anything</h2>
+            <br>
+            <form action="/ask" method="POST">
+                <div style="display: flex; align-items: center;">
+                    <textarea id="userInput" name="userInput" placeholder="Type your message..." required></textarea>
+                    <button type="button" id="micButton" onclick="startLanguageSelection()" style="margin-left: 10px;">🎤</button>
+                </div>
+                <button type="submit">ASK</button>
+            </form>
+            <br>
+
+            {% if bot_response and user_response %}
+            <div class="response">
+                <p><strong>🙋 ️{{ user_response }}</strong></p>
+                <br>
+                <p><strong>🤖 Bot :</strong></p>
+                <br>
+                    {% for line in bot_response.split('\n') %}
+                        <span class="response-line">{{ line | safe }}</span><br>
+                    {% endfor %}
+                <button id="speakBtn" data-response="{{ bot_response }}" onclick="speakResponse()">🔊 Speak</button>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="section about-section">
+            <h2>About This Bot</h2>
+            <p><strong>AI Chat Assistant</strong> is a smart chatbot designed to help you find quick answers, generate ideas, and solve problems efficiently.</p>
+            <h3>🚀 How It Works?</h3>
+            <p>Simply type your question in the chat box or use the mic to speak, and get an instant response powered by AI.</p>
+            <h3>✨ Key Features</h3>
+            <ul>
+                <li>🔹 Provides instant responses to queries</li>
+                <li>🔹 Supports multiple topics and categories</li>
+                <li>🔹 Keeps track of your recent searches</li>
+                <li>🔹 Easy-to-use, friendly chat interface</li>
+            </ul>
+
+            <h3>💡 How to Use?</h3>
+            <p>🔸 Ask questions about any topic.<br>🔸 Use clear and specific words for better answers.<br>🔸 Review your previous searches for quick reference.</p>
+
+            <p><strong>Start Exploring Now!</strong> Ask your first question and let AI do the rest. 🚀</p>
+        </div>
+    </div>
+
+    <!-- Language Selection Modal -->
+    <div class="overlay" id="overlay"></div>
+    <div class="language-selection" id="language-selection">
+        <h3>Select Language</h3>
+        <button onclick="setLanguage('en-US')">English</button>
+        <button onclick="setLanguage('ta-IN')">Tamil</button>
+    </div>
+
+    <script>
+        let recognition;
+        let isListening = false;
+        let synth = window.speechSynthesis;
+        let voices = [];
+        let utterance;
+        let isSpeaking = false; // Track whether the speech is ongoing
+
+        // Fetch voices after they are loaded
+        function loadVoices() {
+              voices = synth.getVoices();
+        }
+
+        loadVoices();  // Load voices initially
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+              speechSynthesis.onvoiceschanged = loadVoices;  // Ensure voices are loaded when changed
+        }
+
+        function startLanguageSelection() {
+             // Show language selection modal
+                   document.getElementById('overlay').style.display = 'block';
+                   document.getElementById('language-selection').style.display = 'block';
+        }
+
+        function setLanguage(language) {
+              // Set the selected language and close the modal
+                 selectedLanguage = language;
+                 document.getElementById('overlay').style.display = 'none';
+                 document.getElementById('language-selection').style.display = 'none';
+                 startListening();
+        }
+
+           function startListening() {
+            if (!recognition) {
+                  recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                  recognition.lang = selectedLanguage;  // Use the selected language
+                  recognition.onstart = function () {
+                   document.getElementById("micButton").innerText = "🎙 Listening...";
+             };
+                 recognition.onresult = function (event) {
+                  document.getElementById("userInput").value = event.results[0][0].transcript;
+         };
+        recognition.onend = function () {
+            document.getElementById("micButton").innerText = "🎤";
+            isListening = false;
+        };
+    }
+    if (!isListening) {
+        recognition.start();
+        isListening = true;
+    } else {
+        recognition.stop();
+    }
+
+}
+function speakResponse() {
+    let botResponse = document.getElementById("speakBtn").getAttribute("data-response");
+    let utterance = new SpeechSynthesisUtterance(botResponse);
+    let detectedLanguage = "{{bot_response_language}}";
+    let voices = speechSynthesis.getVoices();
+    if (detectedLanguage === "ta-IN") {
+        let tamilVoice = voices.find(voice => voice.lang === "ta-IN" || voice.name.includes("Valluvar"));
+        if (tamilVoice) {
+            utterance.voice = tamilVoice;
+        } else {
+            console.warn("Tamil voice not found. Using default voice.");
+        }
+        utterance.lang = 'ta-IN';
+        }
+        else {
+           let englishVoice = voices.find(voice => voice.lang === "en-US");
+           if (englishVoice) {
+               utterance.voice = englishVoice;
+           } else {
+               console.warn("English voice not found. Using default voice.");
+           }
+           utterance.lang = "en-US";
+        }
+        window.speechSynthesis.speak(utterance);
+        if (!isSpeaking) {
+                speechSynthesis.speak(utterance);
+                speakBtn.innerText = "⏹ Stop";
+                isSpeaking = true;
+                utterance.onend = function () {
+                    speakBtn.innerText = "🔊 Speak";
+                    isSpeaking = false;
+                };
+            } else {
+                speechSynthesis.cancel();
+                speakBtn.innerText = "🔊 Speak";
+                isSpeaking = false;
+            }
+        }
+</script>
+</body>
+</html>
