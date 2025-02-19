@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session 
 import google.generativeai as ai
 import markdown
 from google.generativeai.types.generation_types import StopCandidateException  # Import exception
@@ -76,10 +76,14 @@ def ask():
         except:
             bot_response_language = "Unknown"
 
-    activity_log.append({"s_no": len(activity_log) + 1, "message": user_message})
+    if 'activity_log' not in session:
+        session['activity_log'] = []
+    
+    session['activity_log'].append({"s_no": len(session['activity_log']) + 1, "message": user_message})
+    
+    return render_template('index.html', bot_response=bot_response, user_response=current_msg, 
+                           activity_log=session['activity_log'], bot_response_language=bot_response_language)
 
-    return render_template('index.html', bot_response=bot_response, user_response=current_msg, activity_log=activity_log, bot_response_language=bot_response_language)
-
-
+    
 if __name__ == '__main__':
     app.run(debug=True)
