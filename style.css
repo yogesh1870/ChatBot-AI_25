@@ -13,9 +13,6 @@
     height: 100vh; /* Keeps full screen */
     margin: auto;
     gap: 20px;
-
-
-
 }
 
 /* Table Section (Reduced Width) */
@@ -63,7 +60,6 @@
     flex-direction: column;
     max-height: 100vh; /* Limits height to prevent overflow */
     overflow-y: auto;
-
 }
 
 /* Input Box */
@@ -123,3 +119,43 @@
         width: 100%;
     }
 }
+
+/* Highlight Class */
+.highlight {
+    background-color: yellow;
+}
+
+/* Language Selection Popup */
+.language-selection {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+}
+
+.language-selection button {
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+/* Overlay Background */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+}
+
+
+
