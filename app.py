@@ -7,7 +7,7 @@ from langdetect import detect
 
 app = Flask(__name__)
 
-activity_log = []
+
 responses_dict = {
     'hii': 'Vanakkam! How can I assist you today?',
     'hello': 'Hello! Nalama?',
