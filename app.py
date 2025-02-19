@@ -6,7 +6,7 @@ from langdetect import detect
 
 
 app = Flask(__name__)
-
+app.config['SECRET_KEY'] = 'Samsung@753'
 
 responses_dict = {
     'hii': 'Vanakkam! How can I assist you today?',
