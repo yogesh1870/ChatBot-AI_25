@@ -80,6 +80,7 @@ def ask():
         session['activity_log'] = []
     
     session['activity_log'].append({"s_no": len(session['activity_log']) + 1, "message": user_message})
+    session.modified = True
     
     return render_template('index.html', bot_response=bot_response, user_response=current_msg, 
                            activity_log=session['activity_log'], bot_response_language=bot_response_language)
