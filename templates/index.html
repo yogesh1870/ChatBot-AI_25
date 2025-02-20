@@ -40,6 +40,18 @@
             </form>
             <br>
 
+            <!-- Loading animation -->
+            <div id="loading">
+                <div class="spinner">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <p><strong> Thinking...🤔</strong></p>
+            </div>
+
+
+
             {% if bot_response and user_response %}
             <div class="response">
                 <p><strong>🙋 ️{{ user_response }}</strong></p>
@@ -175,6 +187,29 @@ function speakResponse() {
                 isSpeaking = false;
             }
         }
+
+    //make_loading_animation
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("form");
+    const loadingDiv = document.getElementById("loading");
+    const responseDiv = document.getElementById("response"); // Assuming response is displayed here
+
+    // Hide loader initially
+    loadingDiv.style.display = "none";
+
+    form.addEventListener("submit", function () {
+        loadingDiv.style.display = "flex"; // Show loading animation
+        responseDiv.style.display = "none"; // Hide response while thinking
+    });
+
+    // Simulate AI response display (Replace this with actual response handling logic)
+    setTimeout(function () {
+        loadingDiv.style.display = "none"; // Hide loading animation
+        responseDiv.style.display = "block"; // Show the response after AI generates output
+    }, 3000); // Simulate delay (adjust this based on actual response time)
+});
+
 </script>
 </body>
 </html>
